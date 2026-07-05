@@ -866,7 +866,7 @@ export default function App() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-16">
             <button onClick={() => { setAuthView(null); setActiveTab("home"); }} className="flex items-center gap-2.5 text-left">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center flex-shrink-0"><Sparkles className="w-4 h-4 text-white" /></div>
+              <img src="/favicon.png" alt="Tadak 로고" className="w-8 h-8 rounded-lg flex-shrink-0" />
               <div className="leading-tight">
                 <span className="block font-black text-foreground tracking-tight text-base" style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>Tadak</span>
                 <span className="hidden sm:block text-[11px] text-muted-foreground">부산 청년을 위한 공모전·커리어 이벤트·청년정책 통합 탐색 서비스</span>
