@@ -100,6 +100,33 @@ const VERTEX_TIPS: Record<keyof CompetencyScores, string> = {
   problemSolving:"위기 대처 및 논리적 문제 해결 역량이 강합니다.", initiative:"새로운 환경에 도전하는 주도적 학습 의지가 돋보입니다.",
   adaptability:"조직 문화 이해도와 유연한 업무 태도가 확인됩니다.",
 };
+const SKILL_SUGGESTIONS: Record<keyof CompetencyScores, string> = {
+  technical:"정보처리기사·SQLD 같은 IT 자격증이나 AWS/GCP 클라우드 자격증, 최신 프레임워크(React·Spring 등) 프로젝트 경험을 쌓으면 강점이 더 부각돼요.",
+  communication:"OPIc·TOEIC Speaking 같은 스피킹 자격증이나 협업툴(Jira·Notion) 활용 경험, 스터디·해커톤 발표 경험을 쌓아보세요.",
+  problemSolving:"코딩테스트(백준·프로그래머스) 문제풀이나 SW역량테스트, 알고리즘 관련 자격증을 준비하면 좋아요.",
+  initiative:"해커톤·공모전 참가, 사이드 프로젝트 운영, 새로운 언어·프레임워크 스터디 개설 등 도전 경험을 늘려보세요.",
+  adaptability:"다양한 직군과의 협업 프로젝트, 인턴십, 어학 자격증(오픽·토익스피킹) 등으로 유연한 업무 적응력을 보여줄 수 있어요.",
+};
+const SKILL_INDUSTRY_GROUPS: { keywords: string[]; industries: string[] }[] = [
+  { keywords:["python","파이썬"], industries:["데이터엔지니어","데이터분석가","AI(인공지능)","머신러닝","딥러닝","빅데이터","백엔드/서버개발"] },
+  { keywords:["java","자바"], industries:["Java","백엔드/서버개발","SI개발","SpringBoot"] },
+  { keywords:["spring","스프링"], industries:["SpringBoot","백엔드/서버개발"] },
+  { keywords:["sql","데이터베이스","db"], industries:["DW","데이터엔지니어","데이터분석가","백엔드/서버개발"] },
+  { keywords:["aws","클라우드","gcp","azure"], industries:["클라우드","인프라","SaaS","IDC"] },
+  { keywords:["머신러닝","ml"], industries:["머신러닝","AI(인공지능)","모델링","데이터 사이언티스트"] },
+  { keywords:["딥러닝"], industries:["딥러닝","AI(인공지능)","머신러닝","모델링"] },
+  { keywords:["데이터","알고리즘"], industries:["데이터엔지니어","데이터분석가","빅데이터","데이터시각화","알고리즘","데이터 사이언티스트"] },
+  { keywords:["react","프론트","javascript","html","css"], industries:["프론트엔드","웹개발","반응형웹","HTML","CSS","웹표준·웹접근성","퍼블리셔"] },
+  { keywords:["앱","android","ios","kotlin","swift"], industries:["앱개발"] },
+  { keywords:["보안","해킹","정보보호"], industries:["정보보안","보안컨설팅"] },
+  { keywords:["네트워크"], industries:["네트워크","정보통신","인프라"] },
+  { keywords:["임베디드","펌웨어","하드웨어"], industries:["임베디드","펌웨어","H/W","HMI"] },
+  { keywords:["게임","unity","언리얼"], industries:["게임개발","Unity"] },
+  { keywords:["c++","c#",".net"], industries:["C++","C#",".NET","ASP.NET"] },
+  { keywords:["기획","pm","프로젝트관리"], industries:["PM(프로젝트매니저)","교육기획","ICT컨설팅","IT컨설팅"] },
+  { keywords:["qa","테스트","테스터"], industries:["QA/테스터"] },
+  { keywords:["go","golang"], industries:["GoLang"] },
+];
 const TYPE_META = {
   policy:      { label:"정책",  icon: FileText,  badgeClass:"bg-emerald-50 text-emerald-700 border-emerald-200" },
   competition: { label:"공모전", icon: Trophy,    badgeClass:"bg-amber-50 text-amber-700 border-amber-200" },
@@ -127,16 +154,25 @@ function parseAgeRange(r: string): [number, number] {
   if (r === "만 30~34세") return [30, 34];
   return [15, 69];
 }
+const COMPETENCY_SCORE_CAP = 78;
 function analyzeEssay(text: string): CompetencyScores {
   const lower = text.toLowerCase();
   const count = (words: string[]) => words.reduce((s, w) => s + (lower.split(w).length - 1), 0);
   return {
-    technical: Math.min(97, 52 + count(["개발","프로그래밍","설계","python","java","sql","데이터","알고리즘","aws","클라우드"]) * 6),
-    communication: Math.min(97, 48 + count(["팀","협업","소통","발표","커뮤니케이션","리더","조율","협력"]) * 6),
-    problemSolving: Math.min(97, 50 + count(["문제","해결","개선","최적화","극복","전략","효율","솔루션"]) * 6),
-    initiative: Math.min(97, 46 + count(["도전","주도","혁신","새로운","시도","창의","아이디어","추진"]) * 6),
-    adaptability: Math.min(97, 48 + count(["적응","유연","변화","다양","경험","배우","성장","조화"]) * 6),
+    technical: Math.min(COMPETENCY_SCORE_CAP, 38 + count(["개발","프로그래밍","설계","python","java","sql","데이터","알고리즘","aws","클라우드"]) * 4),
+    communication: Math.min(COMPETENCY_SCORE_CAP, 34 + count(["팀","협업","소통","발표","커뮤니케이션","리더","조율","협력"]) * 4),
+    problemSolving: Math.min(COMPETENCY_SCORE_CAP, 36 + count(["문제","해결","개선","최적화","극복","전략","효율","솔루션"]) * 4),
+    initiative: Math.min(COMPETENCY_SCORE_CAP, 32 + count(["도전","주도","혁신","새로운","시도","창의","아이디어","추진"]) * 4),
+    adaptability: Math.min(COMPETENCY_SCORE_CAP, 34 + count(["적응","유연","변화","다양","경험","배우","성장","조화"]) * 4),
   };
+}
+function extractSkillIndustries(text: string): string[] {
+  const lower = text.toLowerCase();
+  const matched = new Set<string>();
+  for (const group of SKILL_INDUSTRY_GROUPS) {
+    if (group.keywords.some(k => lower.includes(k))) group.industries.forEach(ind => matched.add(ind));
+  }
+  return [...matched];
 }
 function getDominantKey(s: CompetencyScores): keyof CompetencyScores {
   return (Object.keys(s) as (keyof CompetencyScores)[]).reduce((a, b) => s[a] > s[b] ? a : b);
@@ -153,13 +189,17 @@ function decomposeKeywords(query: string, pool: readonly string[]): string[] {
   pool.filter(k => words.some(w => k.toLowerCase().includes(w.toLowerCase()))).forEach(k => { if (!chips.includes(k)) chips.push(k); });
   return chips.slice(0, 6);
 }
-function getJobMatchScore(job: Job, scores: CompetencyScores): number {
+function getJobMatchScore(job: Job, scores: CompetencyScores, skillIndustries: string[] = []): number {
   const keys = Object.keys(scores) as (keyof CompetencyScores)[];
   const avgDiff = keys.reduce((sum, k) => sum + Math.abs(scores[k] - job.requiredCompetency[k]), 0) / keys.length;
-  return Math.round(100 - avgDiff);
+  const skillBonus = skillIndustries.some(ind => job.industry.includes(ind)) ? 20 : 0;
+  return Math.min(100, Math.round(100 - avgDiff + skillBonus));
 }
-function getJobMatchReasons(job: Job, searchQuery: string, scores?: CompetencyScores | null): string[] {
+function getJobMatchReasons(job: Job, searchQuery: string, scores?: CompetencyScores | null, skillIndustries: string[] = []): string[] {
   const reasons: string[] = [];
+  if (skillIndustries.some(ind => job.industry.includes(ind))) {
+    reasons.push(`자기소개서에 작성하신 기술·자격 내용이 ${job.industry} 분야와 잘 맞아요`);
+  }
   if (scores) {
     const dominant = getDominantKey(scores);
     if (job.requiredCompetency[dominant] >= 60) {
@@ -336,8 +376,8 @@ function PolicyCard({ policy, saved, onSave, onDetail, filter, onConditionEdit }
   );
 }
 
-function JobCard({ job, saved, onSave, onDetail, searchQuery, scores }: { job: Job; saved: boolean; onSave: () => void; onDetail: () => void; searchQuery: string; scores?: CompetencyScores | null }) {
-  const reasons = getJobMatchReasons(job, searchQuery, scores);
+function JobCard({ job, saved, onSave, onDetail, searchQuery, scores, skillIndustries }: { job: Job; saved: boolean; onSave: () => void; onDetail: () => void; searchQuery: string; scores?: CompetencyScores | null; skillIndustries?: string[] }) {
+  const reasons = getJobMatchReasons(job, searchQuery, scores, skillIndustries);
   return (
     <div onClick={onDetail} className="bg-card border border-border rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group">
       <div className="flex items-start justify-between gap-2">
@@ -382,10 +422,10 @@ function JobCard({ job, saved, onSave, onDetail, searchQuery, scores }: { job: J
 }
 
 // ── Detail Modal ───────────────────────────────────────────────────────────────
-function DetailModal({ item, onClose, saved, onSave, onSwitchTab, policyFilter, onOpenPolicy, scores }: {
+function DetailModal({ item, onClose, saved, onSave, onSwitchTab, policyFilter, onOpenPolicy, scores, skillIndustries }: {
   item: { type: "competition" | "policy" | "job"; id: number } | null;
   onClose: () => void; saved: boolean; onSave: () => void; onSwitchTab: (t: Tab) => void;
-  policyFilter: PolicyFilter; onOpenPolicy: (id: number) => void; scores: CompetencyScores | null;
+  policyFilter: PolicyFilter; onOpenPolicy: (id: number) => void; scores: CompetencyScores | null; skillIndustries?: string[];
 }) {
   const comp = item?.type === "competition" ? COMPETITIONS.find(c => c.id === item.id) : null;
   const policy = item?.type === "policy" ? POLICIES.find(p => p.id === item.id) : null;
@@ -474,7 +514,7 @@ function DetailModal({ item, onClose, saved, onSave, onSwitchTab, policyFilter, 
                   <div className="space-y-2"><p className="text-xs font-semibold text-muted-foreground uppercase">채용 내용</p><p className="text-sm text-muted-foreground leading-relaxed">{job.description}</p></div>
                   <div className="bg-secondary border border-primary/15 rounded-xl p-4 space-y-2">
                     <p className="text-xs font-bold text-primary">내 조건과 맞는 이유</p>
-                    {getJobMatchReasons(job, "", scores).map((r, i) => <div key={i} className="flex items-start gap-2 text-xs text-foreground"><CheckCircle className="w-3 h-3 text-primary/60 mt-0.5 flex-shrink-0" />{r}</div>)}
+                    {getJobMatchReasons(job, "", scores, skillIndustries).map((r, i) => <div key={i} className="flex items-start gap-2 text-xs text-foreground"><CheckCircle className="w-3 h-3 text-primary/60 mt-0.5 flex-shrink-0" />{r}</div>)}
                   </div>
                 </>
               )}
@@ -663,6 +703,7 @@ export default function App() {
   const [analyzeStep, setAnalyzeStep]               = useState(0);
   const [scores, setScores]                         = useState<CompetencyScores | null>(null);
   const [animatedScores, setAnimatedScores]         = useState<CompetencyScores | null>(null);
+  const [essaySkillIndustries, setEssaySkillIndustries] = useState<string[]>([]);
   const [showRadar, setShowRadar]                   = useState(false);
 
   // Tab 5: 팀빌딩
@@ -711,11 +752,11 @@ export default function App() {
       }
       return true;
     }).sort((a, b) => {
-      if (jobSortMode === "match" && scores) return getJobMatchScore(b, scores) - getJobMatchScore(a, scores);
+      if (jobSortMode === "match" && scores) return getJobMatchScore(b, scores, essaySkillIndustries) - getJobMatchScore(a, scores, essaySkillIndustries);
       if (jobSortMode === "deadline") return (a.deadline ? daysUntil(a.deadline) : 9999) - (b.deadline ? daysUntil(b.deadline) : 9999);
       return b.id - a.id;
     });
-  }, [jobQuery, jobSortMode, jobIndustryFilter, jobQuickFilters, scores]);
+  }, [jobQuery, jobSortMode, jobIndustryFilter, jobQuickFilters, scores, essaySkillIndustries]);
 
   const jobTotalPages = Math.max(1, Math.ceil(filteredJobs.length / JOB_PAGE_SIZE));
   const pagedJobs = filteredJobs.slice((jobPage - 1) * JOB_PAGE_SIZE, jobPage * JOB_PAGE_SIZE);
@@ -762,7 +803,7 @@ export default function App() {
     if (analyzeStep < 4) { const t = setTimeout(() => setAnalyzeStep(s => s + 1), 480); return () => clearTimeout(t); }
     const result = analyzeEssay(essayText);
     setAnimatedScores(null);
-    setTimeout(() => { setAnimatedScores(result); setScores(result); setAnalyzing(false); setShowRadar(true); }, 80);
+    setTimeout(() => { setAnimatedScores(result); setScores(result); setEssaySkillIndustries(extractSkillIndustries(essayText)); setAnalyzing(false); setShowRadar(true); }, 80);
   }, [analyzing, analyzeStep, essayText]);
 
   // Track recently viewed items whenever a detail modal is opened
@@ -1067,8 +1108,8 @@ export default function App() {
                   </div>
                   {COMPETENCY_LABELS.map(c => {
                     const val = animatedScores[c.key];
-                    const grade = val >= 85 ? "상" : val >= 70 ? "중" : "하";
-                    const gColor = val >= 85 ? "text-emerald-600" : val >= 70 ? "text-amber-600" : "text-rose-500";
+                    const grade = val >= 65 ? "상" : val >= 50 ? "중" : "하";
+                    const gColor = val >= 65 ? "text-emerald-600" : val >= 50 ? "text-amber-600" : "text-rose-500";
                     return (
                       <div key={c.key}>
                         <div className="flex items-center justify-between mb-1">
@@ -1077,6 +1118,7 @@ export default function App() {
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden"><div className={`h-full ${c.color} rounded-full transition-all duration-700`} style={{ width:`${val}%` }} /></div>
                         <p className="text-[11px] text-muted-foreground mt-0.5">{VERTEX_TIPS[c.key]}</p>
+                        <p className="text-[11px] text-primary mt-1 flex items-start gap-1"><Sparkles className="w-3 h-3 flex-shrink-0 mt-0.5" />{SKILL_SUGGESTIONS[c.key]}</p>
                       </div>
                     );
                   })}
@@ -1179,7 +1221,7 @@ export default function App() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {pagedJobs.map(j => (
                 <JobCard key={j.id} job={j} saved={savedJobs.has(j.id)} onSave={() => toggleSave("job", j.id)}
-                  onDetail={() => setDetailItem({ type:"job", id:j.id })} searchQuery={jobQuery} scores={scores} />
+                  onDetail={() => setDetailItem({ type:"job", id:j.id })} searchQuery={jobQuery} scores={scores} skillIndustries={essaySkillIndustries} />
               ))}
             </div>
             <Pagination page={jobPage} totalPages={jobTotalPages} onChange={setJobPage} />
@@ -1588,7 +1630,7 @@ export default function App() {
 
       {/* Detail Modal */}
       <DetailModal item={detailItem} onClose={() => setDetailItem(null)} saved={detailSaved()} onSave={() => detailItem && toggleSave(detailItem.type, detailItem.id)}
-        onSwitchTab={t => { setDetailItem(null); setActiveTab(t); }} policyFilter={psFilter} onOpenPolicy={id => setDetailItem({ type: "policy", id })} scores={scores} />
+        onSwitchTab={t => { setDetailItem(null); setActiveTab(t); }} policyFilter={psFilter} onOpenPolicy={id => setDetailItem({ type: "policy", id })} scores={scores} skillIndustries={essaySkillIndustries} />
       <Toaster position="top-center" />
     </div>
   );
