@@ -1,22 +1,71 @@
-# Tadak
+Tadak (타닥)
 
-부산 청년을 위한 공모전·커리어 이벤트·청년정책 통합 탐색 서비스
+부산 청년을 위한 청년정책 · 공모전/커리어 이벤트 · 채용공고 통합 탐색 및 AI 역량 매칭 플랫폼
 
-## 실행 방법
+프로젝트 소개
 
-```bash
-npm install
+청년 지원 정보는 지자체 정책, 공모전 플랫폼, 채용 사이트 등으로 뿔뿔이 흩어져 있어 매번 여러 사이트를 오가며 같은 검색을 반복해야 합니다. Tadak은 부산 지역 청년 지원 정책·공모전/이벤트·IT 채용공고 데이터를 한 곳에 모으고, 자기소개서 기반 AI 역량 진단 결과를 바탕으로 나에게 맞는 정책과 공고를 추천해주는 서비스입니다.
+
+핵심 기능
+
+1. 청년정책 키워드 내비게이션
+
+부산광역시 청년지원정책 데이터를 카테고리(주거·금융·교육·문화 등)와 연령/거주지/고용형태/소득구간 등 조건으로 빠르게 필터링해 탐색할 수 있습니다.
+
+2. 오각형 역량 진단
+
+자기소개서나 경험 기술서를 입력하면 Gemini가 이를 분석해 5대 역량(전공역량 · 글로벌소통 · 문제해결력 · 도전정신 · 조직적응력)으로 이루어진 오각형 역량 차트를 생성합니다.
+
+3. 채용공고 스마트 매칭
+
+부산 지역 IT 채용공고(사람인 크롤링 데이터)에서 요구 역량을 규칙 기반으로 추출해 5차원 벡터로 변환하고, 사용자의 역량 벡터와 코사인 유사도를 계산해 적합도 순으로 공고를 추천합니다.
+
+4. 공모전/청년 이벤트·네트워킹 탐색
+
+부산 지역 청년 대상 공모전 및 네트워킹 이벤트 정보를 모아볼 수 있는 허브를 제공합니다.
+
+기술 스택
+
+
+프론트엔드: Next.js (App Router), TypeScript, Tailwind CSS, Recharts
+백엔드/DB: Supabase (PostgreSQL)
+AI: Claude API (Anthropic) — 자기소개서 역량 분석
+데이터 파이프라인: 정책 CSV 및 크롤링 원본(JSON)을 스크립트로 전처리
+
+
+실행 방법
+
+bashnpm install
 npm run dev      # 개발 서버
-npm run build     # 프로덕션 빌드
-```
+npm run build    # 프로덕션 빌드
 
-## 데이터
+데이터
 
-`src/data/raw/`의 크롤링 원본 JSON을 `scripts/transform*.js`가 `src/data/processed/*.ts`로 변환합니다.
-원본 데이터가 갱신되면 아래 스크립트를 다시 실행하세요.
+src/data/raw/에 있는 크롤링 원본 JSON 데이터를 아래 변환 스크립트가 src/data/processed/*.ts로 가공합니다. 원본 데이터가 갱신되면 해당 스크립트를 다시 실행해 주세요.
 
-```bash
-node scripts/transformPolicies.js
-node scripts/transformCompetitions.js
-node scripts/transformJobs.js
-```
+bashnode scripts/transformPolicies.js       # 부산 청년지원정책 (109건)
+node scripts/transformCompetitions.js   # 공모전/청년 이벤트
+node scripts/transformJobs.js           # 부산 IT 채용공고 (사람인, 약 350건)
+
+데이터 출처
+
+
+정책: 부산광역시 청년지원정책 현황 공공데이터 (CSV)
+채용공고: 사람인 부산 지역 IT 공고 크롤링
+공모전/이벤트: 오프라인 일회성 크롤링 데이터
+
+
+
+참고: 외부 공공 API(온통청년, 보조금24 등)는 연동 리스크를 줄이기 위해 이번 버전에서는 사용하지 않았습니다.
+
+
+
+향후 계획
+
+
+채용공고 역량 벡터 추출을 Claude API 배치 처리 기반으로 고도화
+정책/공모전 데이터 최신화 자동화
+
+
+
+행사: 부산 청년 AI 해커톤 (2026.6.30 ~ 7.5)
