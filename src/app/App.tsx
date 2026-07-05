@@ -154,16 +154,18 @@ function parseAgeRange(r: string): [number, number] {
   if (r === "만 30~34세") return [30, 34];
   return [15, 69];
 }
-const COMPETENCY_SCORE_CAP = 78;
+const COMPETENCY_SCORE_FLOOR = 20;
+const COMPETENCY_SCORE_CAP = 70;
 function analyzeEssay(text: string): CompetencyScores {
   const lower = text.toLowerCase();
   const count = (words: string[]) => words.reduce((s, w) => s + (lower.split(w).length - 1), 0);
+  const score = (hits: number) => Math.min(COMPETENCY_SCORE_CAP, COMPETENCY_SCORE_FLOOR + hits * 6);
   return {
-    technical: Math.min(COMPETENCY_SCORE_CAP, 38 + count(["개발","프로그래밍","설계","python","java","sql","데이터","알고리즘","aws","클라우드"]) * 4),
-    communication: Math.min(COMPETENCY_SCORE_CAP, 34 + count(["팀","협업","소통","발표","커뮤니케이션","리더","조율","협력"]) * 4),
-    problemSolving: Math.min(COMPETENCY_SCORE_CAP, 36 + count(["문제","해결","개선","최적화","극복","전략","효율","솔루션"]) * 4),
-    initiative: Math.min(COMPETENCY_SCORE_CAP, 32 + count(["도전","주도","혁신","새로운","시도","창의","아이디어","추진"]) * 4),
-    adaptability: Math.min(COMPETENCY_SCORE_CAP, 34 + count(["적응","유연","변화","다양","경험","배우","성장","조화"]) * 4),
+    technical: score(count(["개발","프로그래밍","설계","python","java","sql","데이터","알고리즘","aws","클라우드"])),
+    communication: score(count(["팀","협업","소통","발표","커뮤니케이션","리더","조율","협력"])),
+    problemSolving: score(count(["문제","해결","개선","최적화","극복","전략","효율","솔루션"])),
+    initiative: score(count(["도전","주도","혁신","새로운","시도","창의","아이디어","추진"])),
+    adaptability: score(count(["적응","유연","변화","다양","경험","배우","성장","조화"])),
   };
 }
 function extractSkillIndustries(text: string): string[] {
