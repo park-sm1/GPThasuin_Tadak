@@ -772,7 +772,28 @@ export default function App() {
   }, [detailItem]);
 
   const radarData = COMPETENCY_LABELS.map(c => ({ subject: c.label, value: animatedScores?.[c.key] ?? 0, fullMark: 100 }));
-  const myCharacter = scores ? getCharacter(scores) : null;
+  const [customNickname, setCustomNickname] = useState<string | null>(null);
+  const [editingNickname, setEditingNickname] = useState(false);
+  const [nicknameDraft, setNicknameDraft] = useState("");
+  const baseCharacter = scores ? getCharacter(scores) : null;
+  const myCharacter = baseCharacter ? { ...baseCharacter, name: customNickname || baseCharacter.name } : null;
+  function startEditNickname() {
+    if (!myCharacter) return;
+    setNicknameDraft(myCharacter.name);
+    setEditingNickname(true);
+  }
+  function saveNickname() {
+    const trimmed = nicknameDraft.trim();
+    if (trimmed) setCustomNickname(trimmed);
+    setEditingNickname(false);
+  }
+  const writePostDisabled = !!user && !myCharacter;
+  const writePostTitle = !user ? undefined : (myCharacter ? undefined : "역량진단을 먼저 완료해주세요");
+  function handleWritePostClick() {
+    if (!user) { setAuthView("login"); return; }
+    if (!myCharacter) return;
+    setShowWriteModal(true);
+  }
 
   // Handlers
   function toggleSave(type: "competition" | "policy" | "job", id: number) {
@@ -873,7 +894,6 @@ export default function App() {
               </div>
             </button>
             <div className="flex items-center gap-4 flex-shrink-0">
-              <span className="hidden md:flex items-center gap-1 text-[11px] text-muted-foreground"><Clock className="w-3 h-3" />최근 업데이트 2시간 전</span>
               {user ? (
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-full bg-secondary text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">{user.name.slice(0,1).toUpperCase()}</div>
@@ -891,7 +911,7 @@ export default function App() {
                 <button key={id} onClick={() => setActiveTab(id)}
                   className={`flex items-center gap-1.5 px-3 sm:px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-colors ${activeTab === id ? "border-primary text-primary font-bold" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
                   <Icon className="w-4 h-4" />{label}
-                  {id === "mypage" && savedList.length > 0 && <span className="w-4 h-4 text-[10px] font-bold bg-primary text-white rounded-full flex items-center justify-center">{savedList.length}</span>}
+                  {id === "mypage" && user && savedList.length > 0 && <span className="w-4 h-4 text-[10px] font-bold bg-primary text-white rounded-full flex items-center justify-center">{savedList.length}</span>}
                 </button>
               ))}
             </div>
@@ -913,8 +933,8 @@ export default function App() {
             isSaved={isSaved} onToggleSave={toggleSave}
             onOpenDetail={(type, id) => setDetailItem({ type, id })}
             onNavigate={goToTab}
-            onWritePost={() => setShowWriteModal(true)}
-            canWritePost={!!myCharacter}
+            onWritePost={handleWritePostClick}
+            canWritePost={!writePostDisabled}
           />
         )}
 
@@ -1067,7 +1087,13 @@ export default function App() {
                       <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm">{myCharacter.icon}</div>
                       <div>
                         <span className={`text-xs font-bold ${myCharacter.colorClass}`}>{myCharacter.type}</span>
-                        <p className={`font-bold mt-0.5 ${myCharacter.colorClass}`}>{myCharacter.name}</p>
+                        {editingNickname ? (
+                          <input autoFocus value={nicknameDraft} onChange={e => setNicknameDraft(e.target.value)}
+                            onBlur={saveNickname} onKeyDown={e => { if (e.key === "Enter") saveNickname(); if (e.key === "Escape") setEditingNickname(false); }}
+                            className={`font-bold mt-0.5 bg-transparent border-b border-current outline-none w-full ${myCharacter.colorClass}`} />
+                        ) : (
+                          <p onClick={startEditNickname} title="클릭하여 닉네임 변경" className={`font-bold mt-0.5 cursor-pointer hover:underline ${myCharacter.colorClass}`}>{myCharacter.name}</p>
+                        )}
                         <p className="text-xs text-muted-foreground mt-0.5">역량 분석 기반 부여된 캐릭터 타이틀</p>
                       </div>
                     </div>
@@ -1316,7 +1342,7 @@ export default function App() {
                   <h1 className="text-2xl font-black text-foreground mb-1" style={{ letterSpacing:"-0.02em" }}>팀빌딩 커뮤니티</h1>
                   <p className="text-sm text-muted-foreground">역량 타이틀 기반 익명 프로필로 공모전 팀원을 모집해보세요</p>
                 </div>
-                <button onClick={() => setShowWriteModal(true)} disabled={!myCharacter} title={myCharacter ? undefined : "역량진단을 먼저 완료해주세요"}
+                <button onClick={handleWritePostClick} disabled={writePostDisabled} title={writePostTitle}
                   className="flex items-center gap-1.5 text-sm font-semibold bg-primary text-primary-foreground px-4 py-2.5 rounded-xl hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0">
                   <UserPlus className="w-4 h-4" /> 팀원 모집글 쓰기
                 </button>
@@ -1328,7 +1354,13 @@ export default function App() {
                   <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-2xl shadow-sm">{myCharacter.icon}</div>
                   <div>
                     <span className={`text-xs font-bold ${myCharacter.colorClass}`}>{myCharacter.type}</span>
-                    <p className={`font-bold mt-0.5 ${myCharacter.colorClass}`}>{myCharacter.name}</p>
+                    {editingNickname ? (
+                      <input autoFocus value={nicknameDraft} onChange={e => setNicknameDraft(e.target.value)}
+                        onBlur={saveNickname} onKeyDown={e => { if (e.key === "Enter") saveNickname(); if (e.key === "Escape") setEditingNickname(false); }}
+                        className={`font-bold mt-0.5 bg-transparent border-b border-current outline-none w-full ${myCharacter.colorClass}`} />
+                    ) : (
+                      <p onClick={startEditNickname} title="클릭하여 닉네임 변경" className={`font-bold mt-0.5 cursor-pointer hover:underline ${myCharacter.colorClass}`}>{myCharacter.name}</p>
+                    )}
                     <p className="text-xs text-muted-foreground mt-0.5">역량 분석 기반 자동 부여된 캐릭터</p>
                   </div>
                 </div>
@@ -1409,6 +1441,13 @@ export default function App() {
               <h1 className="text-2xl font-black text-foreground mb-1" style={{ letterSpacing:"-0.02em" }}>마이페이지</h1>
               <p className="text-sm text-muted-foreground">관심 등록한 항목과 응모·지원 내역을 한눈에 관리하세요</p>
             </div>
+            {!user ? (
+              <div className="bg-muted rounded-2xl p-14 text-center space-y-4">
+                <p className="font-semibold text-foreground">로그인 후 이용해주세요.</p>
+                <button onClick={() => setAuthView("login")} className="text-sm font-semibold bg-primary text-primary-foreground px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition-colors">로그인하기</button>
+              </div>
+            ) : (
+            <>
             {/* Summary cards */}
             <div className="grid grid-cols-3 gap-3">
               {([["saved","관심목록", savedList.length], ["applied","응모·지원", appliedItems.length], ["recent","최근 본 항목", recentList.length]] as [MypageTab, string, number|string][]).map(([tab, label, count]) => (
@@ -1416,14 +1455,6 @@ export default function App() {
                   className={`rounded-2xl border p-4 text-center transition-all ${mypageTab===tab?"border-primary bg-secondary":"border-border bg-card hover:border-primary/40"}`}>
                   <p className={`text-2xl font-black ${mypageTab===tab?"text-primary":"text-foreground"}`}>{count}</p>
                   <p className="text-xs text-muted-foreground mt-1">{label}</p>
-                </button>
-              ))}
-            </div>
-            {/* Tabs */}
-            <div className="flex bg-muted rounded-xl p-1 gap-0.5">
-              {(["saved","applied","recent"] as MypageTab[]).map(t => (
-                <button key={t} onClick={() => setMypageTab(t)} className={`flex-1 text-xs font-medium py-2 rounded-lg transition-colors ${mypageTab===t?"bg-card text-foreground shadow-sm":"text-muted-foreground hover:text-foreground"}`}>
-                  {t==="saved"?"관심목록":t==="applied"?"응모·지원 내역":"최근 본 항목"}
                 </button>
               ))}
             </div>
@@ -1546,6 +1577,8 @@ export default function App() {
                   })
                 )}
               </div>
+            )}
+            </>
             )}
           </div>
         )}
