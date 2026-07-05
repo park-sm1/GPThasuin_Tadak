@@ -1,11 +1,22 @@
+# Tadak
 
-  # AI 기반 지원금 매칭 서비스
+부산 청년을 위한 공모전·커리어 이벤트·청년정책 통합 탐색 서비스
 
-  This is a code bundle for AI 기반 지원금 매칭 서비스. The original project is available at https://www.figma.com/design/ZNCi4OmQdyTYpJ0soRFjeQ/AI-%EA%B8%B0%EB%B0%98-%EC%A7%80%EC%9B%90%EA%B8%88-%EB%A7%A4%EC%B9%AD-%EC%84%9C%EB%B9%84%EC%8A%A4.
+## 실행 방법
 
-  ## Running the code
+```bash
+npm install
+npm run dev      # 개발 서버
+npm run build     # 프로덕션 빌드
+```
 
-  Run `npm i` to install the dependencies.
+## 데이터
 
-  Run `npm run dev` to start the development server.
-  
+`src/data/raw/`의 크롤링 원본 JSON을 `scripts/transform*.js`가 `src/data/processed/*.ts`로 변환합니다.
+원본 데이터가 갱신되면 아래 스크립트를 다시 실행하세요.
+
+```bash
+node scripts/transformPolicies.js
+node scripts/transformCompetitions.js
+node scripts/transformJobs.js
+```
